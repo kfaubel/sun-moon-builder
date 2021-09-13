@@ -1,0 +1,36 @@
+// Base set from: https://github.com/tsconfig/bases/blob/main/bases/node14.json
+// Ref: https://www.typescriptlang.org/tsconfig
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "display": "Node 14",
+  
+    "compilerOptions": {
+      //"lib": ["es2020"],                          // Reccomended for Node 14 - lib version in generated JS code (default matches target)
+      "module": "commonjs",                         // Reccomended for Node 14 - what module resolution system to assume when generating JS code
+      "target":"ES2020",                            // Reccomended for Node 14 - what flavor of JS to generate natively, newer syntax generates emulated code
+
+      "moduleResolution": "Node",                   // How tsc tries to find modules, tsc matches nodejs so "node" is the best choice.  Default for Node.
+
+      "strict": true,                               // Reccomended for Node 14
+      "esModuleInterop": true,                      // Reccomended for Node 14
+      "skipLibCheck": true,                         // Reccomended for Node 14
+      "forceConsistentCasingInFileNames": true,     // Reccomended for Node 14
+
+      "sourceMap": true,                            // Generates .map file for debugging
+      "outDir": "./build/",                         // write .js and .map files here
+      "rootDir": "./src",                           // Prevent an extra /src in the ourDir folder
+      "baseUrl": "./",                              // Assume imports are relative to current directory
+      "declaration": true,                          // Emit *.d.ts files
+
+      "noImplicitAny": true,                        // Extra checking
+      "strictNullChecks": true                      // Extra checking
+    },
+  
+  "include": [
+      "src/**/*.ts",
+      "tests/**/*.ts"
+  ],
+  "exclude": [
+      "node_modules"
+  ]
+}

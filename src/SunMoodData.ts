@@ -28,11 +28,14 @@ import { LoggerInterface } from "./Logger";
 // }
 export interface SunMoonJson {
     current_time: string;
+    date: string;
     sunrise: string;
     sunset: string; 
     solor_noon: string;           
     moonrise: string;
     moonset: string;
+    firstLight?: string;
+    lastLight?: string;
 }
 
 export class SunMoonData {
@@ -43,13 +46,13 @@ export class SunMoonData {
     }    
 
     // Date is optional and used mostly for testing.  Format is: YYYY-MM-DD
-    public async getSunMoonData(lat: string, lon: string, apiKey: string, dateStr: string = ""): Promise<SunMoonJson | null> { 
+    public async getSunMoonData(lat: string, lon: string, apiKey: string, dateStr = ""): Promise<SunMoonJson | null> { 
         let rawJson: SunMoonJson | null = null;
 
         const dateParam = (dateStr !=="") ? `&date=${dateStr}` : "";
 
-        const url = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&lat=${lat}&long=${lon}${dateParam}`
-        // this.logger.info(`URL: ${url}`);
+        const url = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&lat=${lat}&long=${lon}${dateParam}`;
+        this.logger.info(`URL: ${url}`);
 
         try {
             const response = await axios.get(url, {headers: {"Content-Encoding": "gzip"}});

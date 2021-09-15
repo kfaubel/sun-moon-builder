@@ -7709,10 +7709,6 @@
             const lines = pathToLines(stroke_path);
             const old_fillStyle = this.fillStyle;
             this.fillStyle = this.strokeStyle;
-            if (this.fillStyle instanceof CanvasGradient) // KTF
-                console.log(`stroke() has a gradient to use`);
-            else
-                console.log(`stroke() - no gradient`);
             this.imageSmoothingEnabled ? this.fill_aa(lines) : this.fill_noaa(lines);
             this.fillStyle = old_fillStyle;
 
@@ -7870,7 +7866,6 @@
          * @memberof Context
          */
         fill_aa(lines) {
-            console.log("using fill_aa"); // KTF
             //get just the color part
             const rgb = and(this._fillColor, 0xFFFFFF00);
             const alpha = and(this._fillColor, 0xFF);
@@ -7924,7 +7919,6 @@
          * @memberof Context
          */
         fill_noaa(lines) {
-            console.log("using fill_noaa"); // KTF
             //get just the color part
             and(this._fillColor, 0xFFFFFF00);
             const bounds = calcMinimumBounds(lines);

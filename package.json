@@ -1,6 +1,6 @@
 {
   "name": "sun-moon-builder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Create jpegs with data about sunrise/sunset and moonrise/moonset",
   "main": "index.js",
   "types": "index.d.ts",

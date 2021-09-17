@@ -4,6 +4,7 @@ import fs, { stat } from "fs";
 import path from "path";
 import dateFormat from "dateformat";
 import * as pure from "pureimage";
+
 import { SunMoonData, SunMoonJson } from "./SunMoodData";
 import { LoggerInterface } from "./Logger";
 
@@ -48,9 +49,7 @@ export class SunMoonImage {
         }
     }
 
-    public async getImage(location: string, lat: string, lon: string, apiKey: string, dateStr = "") : Promise<ImageResult | null> {
-        const title = `Sun & Moon Times for ${location}`;
-        
+    public async getImage(location: string, lat: string, lon: string, apiKey: string, dateStr = "") : Promise<ImageResult | null> {        
         const sunMoonData: SunMoonData = new SunMoonData(this.logger);
 
         const sunMoonJson: SunMoonJson | null = await  sunMoonData.getSunMoonData(lat, lon, apiKey, dateStr);
@@ -60,35 +59,46 @@ export class SunMoonImage {
             return null;
         }
 
+        // Fix up the data
         sunMoonJson.firstLight = this.getTwilight(sunMoonJson?.sunrise, "am");
         sunMoonJson.lastLight  = this.getTwilight(sunMoonJson?.sunset,  "pm");
 
+        if (sunMoonJson.moonrise === "-:-") // No moonrise this day.  Use AM midnight
+            sunMoonJson.moonrise = "0";
+        if (sunMoonJson.moonset === "-:-")  // No moonset this day. Use PM midnight
+            sunMoonJson.moonset = "360";
+
+        const twilightDegrees          = 24;     // 24 degrees before sunrise and 24 degrees after sunset
+        const twilightMinutes          = 24 * 4; // 4 minutes per degree (96 minutes)
+
+        const dataDate = new Date(sunMoonJson.date);
+        const title = `Sun & Moon Times for ${location} - ${dateFormat(dataDate, "mmm dS, yyyy")}`;
+
+        // Define layout constants
         const imageHeight              = 1080; 
         const imageWidth               = 1920; 
 
         const centerX                  = imageWidth/2;
-        const centerY                  = imageHeight/2 + 40;
+        const centerY                  = imageHeight/2 + 40;     // leave some extra room at the top for the title
         const sunRadius                = imageHeight/3; //360
         const moonRadius               = imageHeight/4; //270
+        const sunArcWidth              = 20;
+        const moonArcWidth             = 20;
 
         const backgroundColor          = "#E0E0F0";              // format needed by myFillRect
         const circleColor              = "#B0B0B0";
-        const sunCircleColor           = "#303050";
+        const sunCircleColor           = "#504773"; //"#303050";
         const sunArcColor              = "#FCD303";
         const sunUpColor               = "#FDF000";
         const sunDownColor             = "#D1AF02";
         const sunTwilightArcColor1     = "#F0E000";
         const sunTwilightArcColor2     = "#B80010";
-        const sunTwilightArcColor3     = "#500028";
+        const sunTwilightArcColor3     = "#7a2100"; //"#500028";
         const moonArcColor             = "#808080";
         const moonUpColor              = "#D0D0D0";
         const moonDownColor            = "#808080";
         const titleColor               = "#2020F0"; 
         const labelColor               = "#2020F0";
-        
-        const textColor                = "rgb(42,  160,  210)";  //"rgb(40,  200,  80)"; 
-        const arrowColor               = "rgb(255, 0,    0)";
-        const alertColor               = "rgb(200, 0,    0)";
         
         // Approximation of the height of a capital letter
         const largeFontCharHeight       = 54;
@@ -112,34 +122,14 @@ export class SunMoonImage {
 
         const titleY                    = 90; // down from the top of the image
 
-        
-            
-        
-        const toplleft1LabelX               = 380;
-        const toplleft1LabelY               = 350;
-        const toplleft2LabelX               = toplleft1LabelX;
-        const toplleft2LabelY               = toplleft1LabelY + 120;
-        const toplright1LabelX              = 1400;
-        const toplright1LabelY              = 350;
-        const toplright2LabelX              = toplright1LabelX;
-        const toplright2LabelY              = toplright1LabelY + 120;
-        const botleft1LabelX                = 380;
-        const botleft1LabelY                = 680;
-        const botleft2LabelX                = botleft1LabelX;
-        const botleft2LabelY                = botleft1LabelY + 120;
-        const botright1LabelX               = 1400;
-        const botright1LabelY               = 680;
-        const botright2LabelX               = botright1LabelX;
-        const botright2LabelY               = botright1LabelY + 120;
-
-        const moonriseLabelX = centerX - 110;
+        const moonriseLabelX = centerX - 140;
         const moonriseLabelY = centerY - 80;
-        const moonriseValueX = centerX - 110;
-        const moonriseValueY = centerY - 30;
-        const moonsetLabelX  = centerX - 110;
+        const moonriseValueX = centerX - 140;
+        const moonriseValueY = centerY - 20;
+        const moonsetLabelX  = centerX - 140;
         const moonsetLabelY  = centerY + 50;
-        const moonsetValueX  = centerX - 110;
-        const moonsetValueY  = centerY + 110;
+        const moonsetValueX  = centerX - 140;
+        const moonsetValueY  = centerY + 50;
         const dateX          = imageWidth * 3/4;
         const dateY          = imageHeight - 30;
 
@@ -157,28 +147,11 @@ export class SunMoonImage {
         const textWidth: number = ctx.measureText(title).width;
         ctx.fillText(title, (imageWidth - textWidth) / 2, titleY);
 
-        
-        
-        // Draw the labels
-        // ctx.fillStyle = textColor;
-        // ctx.font = mediumFont;
-        // ctx.fillText("Outside Temp",       labelX,       outsideTempY);
-        // ctx.font = largeFont;
-        //
-        // let width: number; // Used multiple times below
-        // width = ctx.measureText(windSpeedStr).width; 
-        // ctx.fillText(windSpeedStr,  windCenterX - width/2,       windCenterY + (largeFontCharHeight/2 - 42) );
-        
-        // Draw the graphic
-        
-
-        
+        // Change our reference to the center of the circle
         ctx.save();
-
-        // Change our reference to the center of the wind circle
         ctx.translate(centerX, centerY);
         
-        // Draw the minor tick marks
+        // Draw the minor tick marks on the hour
         ctx.lineCap = "round";
         ctx.strokeStyle = circleColor;
         ctx.lineWidth = 2;
@@ -202,7 +175,7 @@ export class SunMoonImage {
 
         ctx.restore();
 
-        // Draw the circle for the sun
+        // Draw the path circle for the sun
         ctx.strokeStyle = sunCircleColor;
         ctx.lineWidth = 18;
         ctx.beginPath();
@@ -210,13 +183,13 @@ export class SunMoonImage {
         ctx.stroke();
 
         // Draw the circle for the moon
-
         ctx.strokeStyle = circleColor;
         ctx.lineWidth = 8;
         ctx.beginPath();
         ctx.arc(centerX, centerY, moonRadius, 0, 2 * Math.PI); // Pure 0.3.5 warns on this
         ctx.stroke();
 
+        // Draw the time labels
         ctx.font = smallFont;
         ctx.fillStyle = circleColor; //titleColor;
         ctx.fillText("12 PM", centerX - (ctx.measureText("12 PM").width/2),                  centerY - (sunRadius                       + 50));
@@ -228,51 +201,53 @@ export class SunMoonImage {
         //     "sunrise": "06:20",
         //     "sunset": "19:04",
         //
-        // There is always a sunrise and a sunset at supported latitudes
-        const sunriseAngle     = this.getAngle(sunMoonJson.sunrise);
-        const sunsetAngle      = this.getAngle(sunMoonJson.sunset);
+        // There is always a sunrise and a sunset at the supported latitudes
+        const sunriseAngle    = this.getAngle(sunMoonJson.sunrise);
+        const sunsetAngle     = this.getAngle(sunMoonJson.sunset);
+        const amTwilightAngle = sunriseAngle - twilightDegrees;
+        const pmTwilightAngle = sunsetAngle + twilightDegrees;
 
-        // There is either no moonrise or no moonset that day.  Use midnight instead (0 for moonrise, 360 for moonset)
-        const moonriseAngle    = (sunMoonJson.moonrise === "-:-") ? 0   : this.getAngle(sunMoonJson.moonrise);
-        let moonsetAngle     = (sunMoonJson.moonset === "-:-")  ? 360 : this.getAngle(sunMoonJson.moonset);
+        // If there were no moonrise or moonset this day, we already used 0 or 360 above
+        const moonriseAngle = this.getAngle(sunMoonJson.moonrise);
+        let moonsetAngle    = this.getAngle(sunMoonJson.moonset);
 
         if (moonsetAngle < moonriseAngle) {
-            // actual moonset for today's moonrise is tomorrow. Add 360 to the angle
+            // actual moonset for today's moonrise is tomorrow. Add 360 to the moon angle
             moonsetAngle += 360;
         }
 
-        // Current time is "08:21:14.988" but getAngle only uses hh & mm
+        // Current time format is "08:21:14.988" but getAngle only uses hh & mm so secs and msecs are ignored
         const currentTimeAngle = this.getAngle(sunMoonJson.current_time); 
 
         // Draw the sun up arc
-        ctx.lineWidth = 20;
+        ctx.lineWidth = sunArcWidth;
         ctx.strokeStyle = sunArcColor;
         ctx.beginPath();
         ctx.arc(centerX, centerY, sunRadius, this.getRenderAngle(sunriseAngle), this.getRenderAngle(sunsetAngle)); // Pure 0.3.5 warns on this
         ctx.stroke();
-
-        
         
         // Draw the AM twilight range using a gradient
         const sunriseX    = sunRadius * Math.sin(this.getRenderAngle(sunriseAngle + 90)); 
         const sunriseY    = sunRadius * Math.cos(this.getRenderAngle(sunriseAngle + 90));
-        const amTwilightX = sunRadius * Math.sin(this.getRenderAngle(sunriseAngle + 90 - 22));
-        const amTwilightY = sunRadius * Math.cos(this.getRenderAngle(sunriseAngle + 90 - 22));
+        const amTwilightX = sunRadius * Math.sin(this.getRenderAngle(amTwilightAngle + 90));
+        const amTwilightY = sunRadius * Math.cos(this.getRenderAngle(amTwilightAngle + 90));
 
-        // Set up the gradient
         const amGrad = ctx.createLinearGradient(centerX + sunriseX, centerY - sunriseY, centerX + amTwilightX, centerY - amTwilightY);
         amGrad.addColorStop(0.0, sunTwilightArcColor1);
         amGrad.addColorStop(1.0, sunTwilightArcColor3);
         ctx.strokeStyle = amGrad;
-        ctx.lineWidth = 20;
+        ctx.lineWidth = sunArcWidth;
+        // ctx.beginPath();
+        // ctx.moveTo(centerX + sunriseX, centerY - sunriseY);
+        // ctx.lineTo(centerX + amTwilightX, centerY - amTwilightY);
+        // ctx.stroke();
 
         // Draw the short arc
         ctx.beginPath();
-        ctx.lineWidth = 20;
-        ctx.arc(centerX, centerY, sunRadius, this.getRenderAngle(sunriseAngle - 22), this.getRenderAngle(sunriseAngle)); // Pure 0.3.5 warns on this
+        ctx.arc(centerX, centerY, sunRadius, this.getRenderAngle(amTwilightAngle), this.getRenderAngle(sunriseAngle)); // Pure 0.3.5 warns on this
         ctx.stroke();
 
-        // Draw a longer tick mark at sunrise
+        // Draw a line at sunrise
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.strokeStyle = labelColor;
@@ -285,17 +260,17 @@ export class SunMoonImage {
         ctx.rotate(-this.getRenderAngle(sunriseAngle));
         ctx.restore();
 
-        // Draw a longer tick mark at AM twilight
+        // Draw a line at AM twilight
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.strokeStyle = labelColor;
         ctx.lineWidth = 3;
-        ctx.rotate(this.getRenderAngle(sunriseAngle - 22));
+        ctx.rotate(this.getRenderAngle(amTwilightAngle));
         ctx.beginPath();
         ctx.moveTo(sunRadius - 50, 0);
         ctx.lineTo(sunRadius + 50, 0);
         ctx.stroke();
-        ctx.rotate(-this.getRenderAngle(sunriseAngle + 22));
+        ctx.rotate(-this.getRenderAngle(amTwilightAngle));
         ctx.restore();
 
 
@@ -303,8 +278,8 @@ export class SunMoonImage {
         // Setup the pm gradient
         const sunsetX     = sunRadius * Math.sin(this.getRenderAngle(sunsetAngle + 90)); 
         const sunsetY     = sunRadius * Math.cos(this.getRenderAngle(sunsetAngle + 90));
-        const pmTwilightX = sunRadius * Math.sin(this.getRenderAngle(sunsetAngle + 90 + 22));
-        const pmTwilightY = sunRadius * Math.cos(this.getRenderAngle(sunsetAngle + 90 + 22));
+        const pmTwilightX = sunRadius * Math.sin(this.getRenderAngle(pmTwilightAngle + 90));
+        const pmTwilightY = sunRadius * Math.cos(this.getRenderAngle(pmTwilightAngle + 90));
 
         const pmGrad = ctx.createLinearGradient(centerX + sunsetX, centerY - sunsetY, centerX + pmTwilightX, centerY - pmTwilightY);
         pmGrad.addColorStop(0.0, sunTwilightArcColor1);
@@ -314,7 +289,7 @@ export class SunMoonImage {
         // Draw PM twilight
         ctx.beginPath();
         ctx.lineWidth = 20;
-        ctx.arc(centerX, centerY, sunRadius, this.getRenderAngle(sunsetAngle), this.getRenderAngle(sunsetAngle + 22)); // Pure 0.3.5 warns on this
+        ctx.arc(centerX, centerY, sunRadius, this.getRenderAngle(sunsetAngle), this.getRenderAngle(pmTwilightAngle)); // Pure 0.3.5 warns on this
         ctx.stroke();
 
         // Draw a longer tick mark at sunset
@@ -336,15 +311,14 @@ export class SunMoonImage {
         ctx.translate(centerX, centerY);
         ctx.strokeStyle = labelColor;
         ctx.lineWidth = 3;
-        ctx.rotate(this.getRenderAngle(sunsetAngle + 22));
+        ctx.rotate(this.getRenderAngle(pmTwilightAngle));
         ctx.beginPath();
         ctx.moveTo(sunRadius - 50, 0);
         ctx.lineTo(sunRadius + 50, 0);
         ctx.stroke();
-        ctx.rotate(-this.getRenderAngle(sunsetAngle + 22));
+        ctx.rotate(-this.getRenderAngle(pmTwilightAngle));
         ctx.translate(-centerX, -centerY);
         ctx.restore();
-        
 
         // Draw the moon up arc
         ctx.lineWidth = 20;
@@ -355,6 +329,7 @@ export class SunMoonImage {
         
 
         // Draw the sun
+        ctx.save();
         ctx.translate(centerX, centerY);            // Set the origin to the center
         ctx.rotate(this.getRenderAngle(currentTimeAngle));               // Rotate our reference so the current time is on the X axis
 
@@ -385,9 +360,9 @@ export class SunMoonImage {
         ctx.fill();
         
         ctx.rotate(-this.getRenderAngle(currentTimeAngle));
-        ctx.translate(-centerX, -centerY);
+        ctx.restore();
 
-        // Draw the labels
+        // Draw the labels for sunrise, sunset, first light, last light
         ctx.font = smallFont;
         ctx.fillStyle = labelColor;
 
@@ -400,7 +375,8 @@ export class SunMoonImage {
         // |         | slot 8 | - We need this for mid summer when the sun does not set until 8:30
         // +---------+--------+
         
-        const labelSlots = [ 
+        type Point = {x: number, y: number};
+        const labelSlots: Array<Point> = [ 
             {x: 350, y: 350},
             {x: 300, y: 470},
             {x: 300, y: 680},
@@ -413,65 +389,61 @@ export class SunMoonImage {
         ];
 
         // sunriseAngle is 0-360.  0 is midnight, 180 is noon...
-        let sunriseXY;
-        let amTwilightXY;
-        let sunsetXY;
-        let pmTwilightXY;
+        let sunriseXY: Point;
+        let amTwilightXY: Point;
+        let sunsetXY: Point;
+        let pmTwilightXY: Point;
 
         if (sunriseAngle <= 90) {
             // both sunrise and AM twilight are before 6:00AM
-            sunriseXY = labelSlots[2];
+            sunriseXY    = labelSlots[2];
             amTwilightXY = labelSlots[3];
-        } else if (sunriseAngle < 112) {
+        } else if (sunriseAngle < 90 + twilightDegrees) {
             // sunrise is after 6:00 AM, but AM twilight is before 6:00 AM
-            sunriseXY = labelSlots[1];
+            sunriseXY    = labelSlots[1];
             amTwilightXY = labelSlots[2];
         } else {
             // both sunrise and AM twilight are after 6:00 AM
-            sunriseXY = labelSlots[0];
+            sunriseXY    = labelSlots[0];
             amTwilightXY = labelSlots[1];
         }
 
-        if (sunsetAngle <= 248) {
+        if (sunsetAngle <= 270 - twilightDegrees) {
             // both sunset and PM twilight are before 6:00 PM
-            sunsetXY = labelSlots[4];
+            sunsetXY     = labelSlots[4];
             pmTwilightXY = labelSlots[5];
         } else if (sunsetAngle < 270) {
             // sunset is before 6:00 PM but PM twilight is after 6:00 PM
-            sunsetXY = labelSlots[5];
+            sunsetXY     = labelSlots[5];
             pmTwilightXY = labelSlots[6];
-        } else if (sunsetAngle <= 290) {
+        } else if (sunsetAngle <= 270 + 20) {
             // both sunset and PM twilight are somewhat after 6:00 PM
-            sunsetXY = labelSlots[6];
+            sunsetXY     = labelSlots[6];
             pmTwilightXY = labelSlots[7];
         } else {
             // both sunset and PM twilight are way past 6:00 PM
-            sunsetXY = labelSlots[7];
+            sunsetXY     = labelSlots[7];
             pmTwilightXY = labelSlots[8];
         }
 
-        ctx.fillText("Sunrise",                                     sunriseXY.x, sunriseXY.y); 
-        ctx.fillText(`${this.convertTime(sunMoonJson.sunrise)}`,    sunriseXY.x, sunriseXY.y + 50);
-        ctx.fillText("Sunset " ,                                    sunsetXY.x,  sunsetXY.y);
-        ctx.fillText(`${this.convertTime(sunMoonJson.sunset)}` ,    sunsetXY.x,  sunsetXY.y + 50);
+        ctx.fillText("Sunrise",                                    sunriseXY.x, sunriseXY.y); 
+        ctx.fillText(`${this.formatTime(sunMoonJson.sunrise)}`,    sunriseXY.x, sunriseXY.y + 50);
+        ctx.fillText("Sunset " ,                                   sunsetXY.x,  sunsetXY.y);
+        ctx.fillText(`${this.formatTime(sunMoonJson.sunset)}` ,    sunsetXY.x,  sunsetXY.y + 50);
 
-        ctx.fillText("First light",                                 amTwilightXY.x, amTwilightXY.y);
-        ctx.fillText(`${this.convertTime(sunMoonJson.firstLight)}`, amTwilightXY.x, amTwilightXY.y + 50);
-        ctx.fillText("Last light" ,                                 pmTwilightXY.x, pmTwilightXY.y);
-        ctx.fillText(`${this.convertTime(sunMoonJson.lastLight)}` , pmTwilightXY.x, pmTwilightXY.y + 50);
+        ctx.fillText("First light",                                amTwilightXY.x, amTwilightXY.y);
+        ctx.fillText(`${this.formatTime(sunMoonJson.firstLight)}`, amTwilightXY.x, amTwilightXY.y + 50);
+        ctx.fillText("Last light" ,                                pmTwilightXY.x, pmTwilightXY.y);
+        ctx.fillText(`${this.formatTime(sunMoonJson.lastLight)}` , pmTwilightXY.x, pmTwilightXY.y + 50);
         
-        
-
+        ctx.font = smallFont;
         ctx.fillStyle = moonArcColor;
-        ctx.fillText("Moonrise",                                  moonriseLabelX, moonriseLabelY); 
-        ctx.fillText(`${(sunMoonJson.moonrise === "-:-") ? "Yesterday" : this.convertTime(sunMoonJson.moonrise)}`, moonriseValueX, moonriseValueY); 
-        ctx.fillText("Moonset",                                   moonsetLabelX,  moonsetLabelY); 
-        ctx.fillText(`${(sunMoonJson.moonset === "-:-") ? "tomorrow" : this.convertTime(sunMoonJson.moonset)}` , moonsetValueX,  moonsetValueY); 
+        ctx.fillText("Moon",                                  centerX - ctx.measureText("Moon").width/2, moonriseLabelY); 
+        ctx.fillText("Rise: ",                                                                                  moonriseValueX,       moonriseValueY); 
+        ctx.fillText(`${(sunMoonJson.moonrise === "0") ? "Yesterday" : this.formatTime(sunMoonJson.moonrise)}`, moonriseValueX + 120, moonriseValueY); 
+        ctx.fillText("Set:",                                                                                    moonsetLabelX,        moonsetLabelY); 
+        ctx.fillText(`${(sunMoonJson.moonset === "360") ? "Tomorrow" : this.formatTime(sunMoonJson.moonset)}` , moonsetValueX + 120,  moonsetValueY); 
 
-        const dataDate = new Date(sunMoonJson.date);
-        ctx.fillStyle = labelColor;
-        ctx.fillText(dateFormat(dataDate, "mmmm dS, yyyy"), dateX, dateY);        
-        
         const jpegImg = jpeg.encode(img, 80);
         
         return {
@@ -495,7 +467,7 @@ export class SunMoonImage {
             Number(timeElements[1]) < 0 ||
             Number(timeElements[1]) > 59) {
             this.logger.warn(`SunMoonImage: getAngle() failed on input "${timeStr}`);
-            return -1;
+            return 0;
         }
         const angle = +timeElements[0] * 15 + +timeElements[1] / 4;
         
@@ -517,7 +489,7 @@ export class SunMoonImage {
     // Input is the time in "hh:mm" format ("00:45"), "hh:mm:ss:nnn"
     // Output: 
     //  "00:45" ==> "12:45 AM"
-    private convertTime(timeStr: string): string {
+    private formatTime(timeStr: string): string {
         const timeElements: Array<string> = timeStr.split(":");
         if (timeElements.length < 2 ||
             isNaN(Number(timeElements[0])) ||
@@ -560,22 +532,23 @@ export class SunMoonImage {
         
         let min = +timeElements[1];
 
+        
         if (amPm === "am") {
-            // subtract 48 minutes (12 degrees)
-            if (min >= 30) {
-                min -= 30;
+            // subtract 96 minutes (24 degrees)
+            if (min >= 36) {
+                min -= 36;
                 hour -= 1;
             } else {
-                min += 30;
+                min += 24;
                 hour -= 2;
             }
         } else {
-            // add 48 minutes (12 degrees)
-            if (min < 30) {
-                min += 30;
+            // add 90 minutes (24 degrees)
+            if (min < 36) {
+                min += 24;
                 hour += 1;
             } else {
-                min -= 30;
+                min -= 36;
                 hour += 2;
             }
         }

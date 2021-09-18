@@ -1,5 +1,4 @@
 import axios from "axios";
-import dateformat from "dateformat";
 import { LoggerInterface } from "./Logger";
 
 // Data from: https://api.ipgeolocation.io/astronomy?apiKey=API_KEY&lat=42.68&long=-71.47

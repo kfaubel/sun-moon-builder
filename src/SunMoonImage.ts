@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import jpeg from "jpeg-js";
-import fs, { stat } from "fs";
 import path from "path";
 import dateFormat from "dateformat";
 import * as pure from "pureimage";

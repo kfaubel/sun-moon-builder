@@ -16,7 +16,7 @@ export class SunMoonBuilder {
         this.writer = writer;
     }
 
-    public async CreateImages(location: string, fileName: string, lat: string, lon: string, apiKey: string, dateStr = ""): Promise<boolean>{
+    public async CreateImages(location: string, fileName: string, lat: string, lon: string, apiKey: string, dateStr:string): Promise<boolean>{
         try {
             const weatherImage: SunMoonImage = new SunMoonImage(this.logger);
 

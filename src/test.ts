@@ -21,7 +21,7 @@ async function run() {
     }
    
     let success = true;
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon.jpg",   "42.4", "-71.6", IPGEOLOACATION_API_KEY);
+    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon.jpg",   "42.4", "-71.6", IPGEOLOACATION_API_KEY, "");
     // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon01.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-01-14");
     // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon02.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-02-15");
     // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon03.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-03-16");

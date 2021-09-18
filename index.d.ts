@@ -1,4 +1,4 @@
-declare module "redcedars-builder";
+declare module "sun-moon-builder";
 
 export interface LoggerInterface {
     error(text: string): void;
@@ -20,5 +20,5 @@ export interface ImageWriterInterface {
 
 export declare class SunMoonBuilder {
     constructor(logger: LoggerInterface, cache: KacheInterface, writer: ImageWriterInterface);
-    CreateImages(url: string): Promise<boolean>
+    CreateImages(name: string, fileName: string, lat: string, lon: string): Promise<boolean>
 }

@@ -6,7 +6,7 @@
   "types": "index.d.ts",
   "scripts": {
     "build": "npm run clean && npm run cppure && tsc",
-    "cppure": "cp src/pureimage-umd.cjs node_modules/pureimage/dist/pureimage-udm.cjs",
+    "cppure": "cp src/pureimage-umd.cjs node_modules/pureimage/dist/pureimage-umd.cjs",
     "clean": "shx rm -rf build/*",
     "test": "npm run build && node app.js",
     "start": "npm run build && node app.js",

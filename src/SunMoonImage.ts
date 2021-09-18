@@ -5,7 +5,7 @@ import path from "path";
 import dateFormat from "dateformat";
 import * as pure from "pureimage";
 
-import { SunMoonData, SunMoonJson } from "./SunMoodData";
+import { SunMoonData, SunMoonJson } from "./SunMoonData";
 import { LoggerInterface } from "./Logger";
 
 export interface ImageResult {
@@ -71,8 +71,9 @@ export class SunMoonImage {
         const twilightDegrees          = 24;     // 24 degrees before sunrise and 24 degrees after sunset
         const twilightMinutes          = 24 * 4; // 4 minutes per degree (96 minutes)
 
-        const dataDate = new Date(sunMoonJson.date);
-        const title = `Sun & Moon Times for ${location} - ${dateFormat(dataDate, "mmm dS, yyyy")}`;
+        const dataDate        = new Date(sunMoonJson.date + "T00:00:00"); // Without the explicit time, Date.Parse assume this is UTC and the day is off by 1.
+        const title           = `Sun & Moon Times for ${location}`;
+        const dateDisplayStr  = `${dateFormat(dataDate, "mmmm dS, yyyy")}`;
 
         // Define layout constants
         const imageHeight              = 1080; 
@@ -107,7 +108,7 @@ export class SunMoonImage {
         const xsmallFontCharHeight      = 22;
 
         const largeFont                 = "72px 'OpenSans-Bold'";     // Title
-        const mediumFont                = "60px 'OpenSans-Regular";   // Other text
+        const mediumFont                = "48px 'OpenSans-Regular";   // Other text
         const smallFont                 = "40px 'OpenSans-Regular'";  // Note at the bottom
         const extraSmallFont            = "30px 'OpenSans-Regular'";  // Note at the bottom
 
@@ -122,16 +123,19 @@ export class SunMoonImage {
 
         const titleY                    = 90; // down from the top of the image
 
-        const moonriseLabelX = centerX - 140;
-        const moonriseLabelY = centerY - 80;
-        const moonriseValueX = centerX - 140;
-        const moonriseValueY = centerY - 20;
-        const moonsetLabelX  = centerX - 140;
-        const moonsetLabelY  = centerY + 50;
-        const moonsetValueX  = centerX - 140;
-        const moonsetValueY  = centerY + 50;
-        const dateX          = imageWidth * 3/4;
-        const dateY          = imageHeight - 30;
+        const moonValuesSpacingY        = 60;
+        
+        const moonLabelX                = centerX - 180;
+        const moonValueX                = centerX - 40;
+
+        const moonHeaderY               = centerY - 140;
+        const moonriseLabelY            = centerY - 60;
+        const moonsetLabelY             = moonriseLabelY + moonValuesSpacingY;
+        const moonAgeLabelY             = moonriseLabelY + moonValuesSpacingY * 2;
+        const moonPhaseLabelY           = moonriseLabelY + moonValuesSpacingY * 3;
+
+        const dateX                     = imageWidth * 3/4;
+        const dateY                     = imageHeight - 20;
 
         const img = pure.make(imageWidth, imageHeight);
         const ctx = img.getContext("2d");
@@ -436,13 +440,22 @@ export class SunMoonImage {
         ctx.fillText("Last light" ,                                pmTwilightXY.x, pmTwilightXY.y);
         ctx.fillText(`${this.formatTime(sunMoonJson.lastLight)}` , pmTwilightXY.x, pmTwilightXY.y + 50);
         
-        ctx.font = smallFont;
+        ctx.font = mediumFont;
         ctx.fillStyle = moonArcColor;
-        ctx.fillText("Moon",                                  centerX - ctx.measureText("Moon").width/2, moonriseLabelY); 
-        ctx.fillText("Rise: ",                                                                                  moonriseValueX,       moonriseValueY); 
-        ctx.fillText(`${(sunMoonJson.moonrise === "0") ? "Yesterday" : this.formatTime(sunMoonJson.moonrise)}`, moonriseValueX + 120, moonriseValueY); 
-        ctx.fillText("Set:",                                                                                    moonsetLabelX,        moonsetLabelY); 
-        ctx.fillText(`${(sunMoonJson.moonset === "360") ? "Tomorrow" : this.formatTime(sunMoonJson.moonset)}` , moonsetValueX + 120,  moonsetValueY); 
+        ctx.fillText("Moon",                                  centerX - ctx.measureText("Moon").width/2, moonHeaderY); 
+
+        ctx.font = smallFont;
+        ctx.fillText("Rise: ",                                                                                  moonLabelX, moonriseLabelY); 
+        ctx.fillText(`${(sunMoonJson.moonrise === "0") ? "Yesterday" : this.formatTime(sunMoonJson.moonrise)}`, moonValueX, moonriseLabelY); 
+        ctx.fillText("Set:",                                                                                    moonLabelX, moonsetLabelY); 
+        ctx.fillText(`${(sunMoonJson.moonset === "360") ? "Tomorrow" : this.formatTime(sunMoonJson.moonset)}` , moonValueX, moonsetLabelY); 
+        ctx.fillText("Age:",                                                                                    moonLabelX, moonAgeLabelY); 
+        ctx.fillText(`${sunMoonJson.lunarIllumination} ${sunMoonJson.lunarWaxWane}`,                            moonValueX, moonAgeLabelY); 
+        
+        ctx.fillText(sunMoonJson.lunarPhase,                   centerX - ctx.measureText(sunMoonJson.lunarPhase).width/2, moonPhaseLabelY); 
+
+        ctx.fillStyle = titleColor;
+        ctx.fillText(dateDisplayStr, dateX, dateY);
 
         const jpegImg = jpeg.encode(img, 80);
         

@@ -21,19 +21,19 @@ async function run() {
     }
    
     let success = true;
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY);
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon01.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-01-14");
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon02.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-02-15");
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon03.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-03-16");
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon04.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-04-17");
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon05.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-05-18");
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon06.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-06-19");
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon07.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-07-20");
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon08.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-08-21");
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon09.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-09-22");
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon10.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-10-23");
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon11.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-11-24");
-    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon12.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-12-25");
+    success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon.jpg",   "42.4", "-71.6", IPGEOLOACATION_API_KEY);
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon01.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-01-14");
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon02.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-02-15");
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon03.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-03-16");
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon04.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-04-17");
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon05.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-05-18");
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon06.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-06-19");
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon07.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-07-20");
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon08.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-08-21");
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon09.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-09-22");
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon10.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-10-23");
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon11.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-11-24");
+    // success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon12.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-12-25");
 
     // Sunrise before 6AM, sunset after 6PM
     success = success && await sunmoonBuilder.CreateImages("Onset, MA", "OnsetSunMoon-June.jpg", "42.4", "-71.6", IPGEOLOACATION_API_KEY, "2021-06-21");

@@ -85,7 +85,7 @@ export class SunMoonImage {
         const sunArcWidth              = 20;
         const moonArcWidth             = 20;
 
-        const backgroundColor          = "#E0E0F0";              // format needed by myFillRect
+        const backgroundColor          = "#FFFFFA";              // format needed by myFillRect
         const circleColor              = "#B0B0B0";
         const sunCircleColor           = "#504773"; //"#303050";
         const sunArcColor              = "#FCD303";
@@ -97,6 +97,7 @@ export class SunMoonImage {
         const moonArcColor             = "#808080";
         const moonUpColor              = "#D0D0D0";
         const moonDownColor            = "#808080";
+        const moonLabelColor           = "#707070";
         const titleColor               = "#2020F0"; 
         const labelColor               = "#2020F0";
         
@@ -440,7 +441,7 @@ export class SunMoonImage {
         ctx.fillText(`${this.formatTime(sunMoonJson.lastLight)}` , pmTwilightXY.x, pmTwilightXY.y + 50);
         
         ctx.font = mediumFont;
-        ctx.fillStyle = moonArcColor;
+        ctx.fillStyle = moonLabelColor;
         ctx.fillText("Moon",                                  centerX - ctx.measureText("Moon").width/2, moonHeaderY); 
 
         ctx.font = smallFont;
@@ -448,7 +449,7 @@ export class SunMoonImage {
         ctx.fillText(`${(sunMoonJson.moonrise === "0") ? "Yesterday" : this.formatTime(sunMoonJson.moonrise)}`, moonValueX, moonriseLabelY); 
         ctx.fillText("Set:",                                                                                    moonLabelX, moonsetLabelY); 
         ctx.fillText(`${(sunMoonJson.moonset === "360") ? "Tomorrow" : this.formatTime(sunMoonJson.moonset)}` , moonValueX, moonsetLabelY); 
-        ctx.fillText("Age:",                                                                                    moonLabelX, moonAgeLabelY); 
+        ctx.fillText("Lum:",                                                                                    moonLabelX, moonAgeLabelY); 
         ctx.fillText(`${sunMoonJson.lunarIllumination} ${sunMoonJson.lunarWaxWane}`,                            moonValueX, moonAgeLabelY); 
         
         ctx.fillText(sunMoonJson.lunarPhase,                   centerX - ctx.measureText(sunMoonJson.lunarPhase).width/2, moonPhaseLabelY); 

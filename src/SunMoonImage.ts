@@ -63,9 +63,9 @@ export class SunMoonImage {
         sunMoonJson.lastLight  = this.getTwilight(sunMoonJson?.sunset,  "pm");
 
         if (sunMoonJson.moonrise === "-:-") // No moonrise this day.  Use AM midnight
-            sunMoonJson.moonrise = "0";
+            sunMoonJson.moonrise = "0:0";
         if (sunMoonJson.moonset === "-:-")  // No moonset this day. Use PM midnight
-            sunMoonJson.moonset = "360";
+            sunMoonJson.moonset = "23:59";
 
         const twilightDegrees          = 24;     // 24 degrees before sunrise and 24 degrees after sunset
         const twilightMinutes          = 24 * 4; // 4 minutes per degree (96 minutes)
@@ -479,7 +479,7 @@ export class SunMoonImage {
             Number(timeElements[0]) > 23 ||
             Number(timeElements[1]) < 0 ||
             Number(timeElements[1]) > 59) {
-            this.logger.warn(`SunMoonImage: getAngle() failed on input "${timeStr}`);
+            this.logger.warn(`SunMoonImage: getAngle() failed on input "${timeStr}"`);
             return 0;
         }
         const angle = +timeElements[0] * 15 + +timeElements[1] / 4;

@@ -1,0 +1,165 @@
+{
+    "lat:42.4-lon:-71.6-date:2021-12-11": {
+        "expiration": 1639285199999,
+        "comment": "Sat Dec 11 2021 23:59:59 GMT-0500 (Eastern Standard Time)",
+        "item": {
+            "location": {
+                "latitude": 42.4,
+                "longitude": -71.6
+            },
+            "date": "2021-12-11",
+            "current_time": "21:28:28.117",
+            "sunrise": "07:05",
+            "sunset": "16:13",
+            "sun_status": "-",
+            "solar_noon": "11:39",
+            "day_length": "09:08",
+            "sun_altitude": -56.59149927395044,
+            "sun_distance": 147329371.1973949,
+            "sun_azimuth": 294.8478460010987,
+            "moonrise": "12:43",
+            "moonset": "23:59",
+            "moon_status": "-",
+            "moon_altitude": 30.486352710936966,
+            "moon_distance": 391612.7175375996,
+            "moon_azimuth": 231.41222281368988,
+            "moon_parallactic_angle": 38.84177703518636,
+            "lunarAgeDays": 7.505495141588071,
+            "lunarIllumination": "51%",
+            "lunarWaxWane": "waxing",
+            "lunarPhase": "First Quarter",
+            "firstLight": "05:29",
+            "lastLight": "05:37"
+        }
+    },
+    "lat:42.4-lon:-71.6-date:2021-06-21": {
+        "expiration": 1639285199999,
+        "comment": "Sat Dec 11 2021 23:59:59 GMT-0500 (Eastern Standard Time)",
+        "item": {
+            "location": {
+                "latitude": 42.4,
+                "longitude": -71.6
+            },
+            "date": "2021-06-21",
+            "current_time": "21:28:29.193",
+            "sunrise": "05:09",
+            "sunset": "20:27",
+            "sun_status": "-",
+            "solar_noon": "12:48",
+            "day_length": "15:18",
+            "sun_altitude": -9.643688234696596,
+            "sun_distance": 152009144.70841885,
+            "sun_azimuth": 314.5406829176054,
+            "moonrise": "16:59",
+            "moonset": "02:38",
+            "moon_status": "-",
+            "moon_altitude": 29.97996435735524,
+            "moon_distance": 361239.48380994244,
+            "moon_azimuth": 168.98912742650032,
+            "moon_parallactic_angle": 5.242228141634398,
+            "lunarAgeDays": 10.627591306995797,
+            "lunarIllumination": "82%",
+            "lunarWaxWane": "waxing",
+            "lunarPhase": "Waxing Gibbous",
+            "firstLight": "03:33",
+            "lastLight": "09:51"
+        }
+    },
+    "lat:42.4-lon:-71.6-date:2021-12-21": {
+        "expiration": 1639285199999,
+        "comment": "Sat Dec 11 2021 23:59:59 GMT-0500 (Eastern Standard Time)",
+        "item": {
+            "location": {
+                "latitude": 42.4,
+                "longitude": -71.6
+            },
+            "date": "2021-12-21",
+            "current_time": "21:28:29.784",
+            "sunrise": "07:12",
+            "sunset": "16:17",
+            "sun_status": "-",
+            "solar_noon": "11:44",
+            "day_length": "09:05",
+            "sun_altitude": -56.01637368040049,
+            "sun_distance": 147182655.80669072,
+            "sun_azimuth": 293.0198353150065,
+            "moonrise": "18:22",
+            "moonset": "09:22",
+            "moon_status": "-",
+            "moon_altitude": 30.92164485567944,
+            "moon_distance": 401189.68437661807,
+            "moon_azimuth": 84.40525289606865,
+            "moon_parallactic_angle": -56.555881404324325,
+            "lunarAgeDays": 16.402398405458698,
+            "lunarIllumination": "97%",
+            "lunarWaxWane": "waxing",
+            "lunarPhase": "Full Moon",
+            "firstLight": "05:36",
+            "lastLight": "05:41"
+        }
+    },
+    "lat:42.4-lon:-71.6-date:2021-09-01": {
+        "expiration": 1639285199999,
+        "comment": "Sat Dec 11 2021 23:59:59 GMT-0500 (Eastern Standard Time)",
+        "item": {
+            "location": {
+                "latitude": 42.4,
+                "longitude": -71.6
+            },
+            "date": "2021-09-01",
+            "current_time": "21:28:30.255",
+            "sunrise": "06:11",
+            "sunset": "19:20",
+            "sun_status": "-",
+            "solar_noon": "12:46",
+            "day_length": "13:09",
+            "sun_altitude": -22.541956204879867,
+            "sun_distance": 151012390.32236162,
+            "sun_azimuth": 305.4588791824259,
+            "moonrise": "00:19",
+            "moonset": "16:19",
+            "moon_status": "-",
+            "moon_altitude": -21.010640450058503,
+            "moon_distance": 399143.6040812646,
+            "moon_azimuth": 10.342636503604467,
+            "moon_parallactic_angle": 11.791742600744481,
+            "lunarAgeDays": 23.5664158954758,
+            "lunarIllumination": "35%",
+            "lunarWaxWane": "waxing",
+            "lunarPhase": "Last Quarter",
+            "firstLight": "04:35",
+            "lastLight": "08:44"
+        }
+    },
+    "lat:42.4-lon:-71.6-date:2021-03-08": {
+        "expiration": 1639285199999,
+        "comment": "Sat Dec 11 2021 23:59:59 GMT-0500 (Eastern Standard Time)",
+        "item": {
+            "location": {
+                "latitude": 42.4,
+                "longitude": -71.6
+            },
+            "date": "2021-03-08",
+            "current_time": "21:28:30.698",
+            "sunrise": "06:09",
+            "sunset": "17:45",
+            "sun_status": "-",
+            "solar_noon": "11:57",
+            "day_length": "11:36",
+            "sun_altitude": -39.745616343850585,
+            "sun_distance": 148389617.47824296,
+            "sun_azimuth": 308.50971832368725,
+            "moonrise": "03:38",
+            "moonset": "12:38",
+            "moon_status": "-",
+            "moon_altitude": -68.83637437360814,
+            "moon_distance": 381821.77874151303,
+            "moon_azimuth": 33.801485944543515,
+            "moon_parallactic_angle": -37.53676297328401,
+            "lunarAgeDays": 23.708275463058683,
+            "lunarIllumination": "34%",
+            "lunarWaxWane": "waxing",
+            "lunarPhase": "Last Quarter"
+        }
+    }
+}

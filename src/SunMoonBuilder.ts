@@ -7,20 +7,20 @@ import { SunMoonImage } from "./SunMoonImage";
 
 export class SunMoonBuilder {
     private logger: LoggerInterface;
-    private cache: KacheInterface | null; // generally null right now, we don't cache the data from the sunmoon station
+    private cache: KacheInterface;
     private writer: ImageWriterInterface;
 
-    constructor(logger: LoggerInterface, cache: KacheInterface | null, writer: ImageWriterInterface) {
+    constructor(logger: LoggerInterface, cache: KacheInterface, writer: ImageWriterInterface) {
         this.logger = logger;
         this.cache = cache; 
         this.writer = writer;
     }
 
-    public async CreateImages(location: string, fileName: string, lat: string, lon: string, apiKey: string, dateStr:string): Promise<boolean>{
+    public async CreateImages(location: string, fileName: string, lat: string, lon: string, apiKey: string, timeZone: string, dateStr:string): Promise<boolean>{
         try {
-            const weatherImage: SunMoonImage = new SunMoonImage(this.logger);
+            const weatherImage: SunMoonImage = new SunMoonImage(this.logger, this.cache);
 
-            const result = await weatherImage.getImage(location, lat, lon, apiKey, dateStr);
+            const result = await weatherImage.getImage(location, lat, lon, apiKey, timeZone, dateStr);
 
             if (result !== null && result.imageData !== null ) {
                 this.logger.info(`CreateImages: Writing: ${fileName}`);
@@ -29,8 +29,8 @@ export class SunMoonBuilder {
                 this.logger.error("CreateImages: No imageData returned from weatherImage.getImage");
                 return false;
             }
-        } catch (e) {
-            this.logger.error(`CreateImages: Exception: ${e}`);
+        } catch (e: any) {
+            this.logger.error(`CreateImages: Exception: ${e.stack}`);
             return false;
         }
 

@@ -1,5 +1,7 @@
 import axios from "axios";
+import moment from "moment-timezone";  // https://momentjs.com/timezone/docs/ &  https://momentjs.com/docs/
 import { LoggerInterface } from "./Logger";
+import { KacheInterface } from "./Kache";
 
 // Data from: https://api.ipgeolocation.io/astronomy?apiKey=API_KEY&lat=42.68&long=-71.47
 // Ref: https://ipgeolocation.io/documentation/astronomy-api.html
@@ -50,27 +52,39 @@ const MIN_PER_DAY = 24 * 60;
 
 export class SunMoonData {
     private logger: LoggerInterface;
+    private cache: KacheInterface;
 
-    constructor(logger: LoggerInterface) {
+    constructor(logger: LoggerInterface, cache: KacheInterface) {
         this.logger = logger;
+        this.cache = cache;
     }    
 
     // Date is optional and used mostly for testing.  Format is: YYYY-MM-DD
-    public async getSunMoonData(lat: string, lon: string, apiKey: string, dateStr = ""): Promise<SunMoonJson | null> { 
+    public async getSunMoonData(lat: string, lon: string, apiKey: string, timeZone: string, dateStr = ""): Promise<SunMoonJson | null> { 
         let rawJson: SunMoonJson | null = null;
         let dateParam: string;
         let date: Date;
+        const now: moment.Moment = moment();
+
 
         if (dateStr === "") {
-            dateParam = "";
             date = new Date();
+            dateParam = now.tz(timeZone).format("YYYY-MM-DD");
         } else {
-            dateParam = `&date=${dateStr}`;
+            dateParam = dateStr;
             date = new Date(dateStr);
-
         }
 
-        const url = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&lat=${lat}&long=${lon}${dateParam}`;
+        const key = `lat:${lat}-lon:${lon}-date:${dateParam}`;
+
+        this.logger.info(`Checking cache for ${key}`);
+
+        const sunMoonJson: SunMoonJson | null = this.cache.get(key) as SunMoonJson;
+        if (sunMoonJson !== null) {
+            return sunMoonJson;
+        }
+
+        const url = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&lat=${lat}&long=${lon}&date=${dateParam}`;
         this.logger.info(`URL: ${url}`);
 
         try {
@@ -83,6 +97,10 @@ export class SunMoonData {
                 rawJson.lunarWaxWane = this.getWaxWane(rawJson.lunarAgeDays);
                 rawJson.lunarPhase = this.getPhaseStr(rawJson.lunarAgeDays);
                 this.logger.info(`Date: ${date.toString()}, age: ${rawJson.lunarAgeDays}, Percent: ${rawJson.lunarIllumination}`);
+
+                const midnightTonight = moment().tz(timeZone).endOf("day");
+
+                this.cache.set(key, rawJson, midnightTonight.valueOf());
             }
         } catch(e) {
             this.logger.error(`SunMoonData: Error getting data: ${e}`);

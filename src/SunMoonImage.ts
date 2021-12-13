@@ -6,6 +6,7 @@ import * as pure from "pureimage";
 
 import { SunMoonData, SunMoonJson } from "./SunMoonData";
 import { LoggerInterface } from "./Logger";
+import { KacheInterface} from "./Kache";
 
 export interface ImageResult {
     imageType: string;
@@ -13,10 +14,12 @@ export interface ImageResult {
 }
 
 export class SunMoonImage {
+    private cache: KacheInterface;
     private logger: LoggerInterface;
 
-    constructor(logger: LoggerInterface) {
+    constructor(logger: LoggerInterface, cache: KacheInterface) {
         this.logger = logger;
+        this.cache = cache;
     }
 
     // This optimized fillRect was derived from the pureimage source code: https://github.com/joshmarinacci/node-pureimage/tree/master/src
@@ -48,10 +51,10 @@ export class SunMoonImage {
         }
     }
 
-    public async getImage(location: string, lat: string, lon: string, apiKey: string, dateStr = "") : Promise<ImageResult | null> {        
-        const sunMoonData: SunMoonData = new SunMoonData(this.logger);
+    public async getImage(location: string, lat: string, lon: string, apiKey: string, timeZone: string, dateStr = "") : Promise<ImageResult | null> {        
+        const sunMoonData: SunMoonData = new SunMoonData(this.logger, this.cache);
 
-        const sunMoonJson: SunMoonJson | null = await  sunMoonData.getSunMoonData(lat, lon, apiKey, dateStr);
+        const sunMoonJson: SunMoonJson | null = await  sunMoonData.getSunMoonData(lat, lon, apiKey, timeZone, dateStr);
 
         if (sunMoonJson === null) {
             this.logger.warn("SunMoonImage: Failed to get data, no image available.\n");
@@ -82,8 +85,8 @@ export class SunMoonImage {
         const centerY                  = imageHeight/2 + 40;     // leave some extra room at the top for the title
         const sunRadius                = imageHeight/3; //360
         const moonRadius               = imageHeight/4; //270
-        const sunArcWidth              = 20;
-        const moonArcWidth             = 20;
+        const sunArcWidth              = 30;
+        const moonArcWidth             = 30;
 
         const backgroundColor          = "#FFFFFA";              // format needed by myFillRect
         const circleColor              = "#B0B0B0";

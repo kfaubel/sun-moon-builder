@@ -22,6 +22,8 @@
     "dotenv": "^10.0.0",
     "jpeg-js": "^0.4.2",
     "meow": "^9.0.0",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.34",
     "pureimage": "^0.3.5"
   },
   "devDependencies": {

@@ -83,13 +83,17 @@ export class SunMoonImage {
 
         const centerX                  = imageWidth/2;
         const centerY                  = imageHeight/2 + 40;     // leave some extra room at the top for the title
-        const sunRadius                = imageHeight/3; //360
-        const moonRadius               = imageHeight/4; //270
+        const sunCircleRadius          = imageHeight/3; //360
+        const moonCircleRadius               = imageHeight/4; //270
         const sunArcWidth              = 30;
         const moonArcWidth             = 30;
+        const sunRadius                = 35;                     // The actual sun drawn on the circle
+        const moonRadius               = 35;
 
         const backgroundColor          = "#FFFFFA";              // format needed by myFillRect
         const circleColor              = "#B0B0B0";
+        const timeLabelColor           = "#B0B0B0"; 
+        const tickColor                = "#B0B0B0";
         const sunCircleColor           = "#504773"; //"#303050";
         const sunArcColor              = "#FCD303";
         const sunUpColor               = "#FDF000";
@@ -97,8 +101,8 @@ export class SunMoonImage {
         const sunTwilightArcColor1     = "#F0E000";
         const sunTwilightArcColor2     = "#B80010";
         const sunTwilightArcColor3     = "#7a2100"; //"#500028";
-        const moonArcColor             = "#808080";
-        const moonUpColor              = "#D0D0D0";
+        const moonArcColor             = "#D0D0D0";
+        const moonUpColor              = "#707070";
         const moonDownColor            = "#808080";
         const moonLabelColor           = "#707070";
         const titleColor               = "#2020F0"; 
@@ -160,13 +164,13 @@ export class SunMoonImage {
         
         // Draw the minor tick marks on the hour
         ctx.lineCap = "round";
-        ctx.strokeStyle = circleColor;
+        ctx.strokeStyle = tickColor;
         ctx.lineWidth = 2;
         for (let i = 0; i < 360; i += 15) {
             ctx.rotate(15 * Math.PI/180);
             ctx.beginPath();
-            ctx.moveTo(sunRadius - 20, 0);
-            ctx.lineTo(sunRadius + 20, 0);
+            ctx.moveTo(sunCircleRadius - 25, 0);
+            ctx.lineTo(sunCircleRadius + 25, 0);
             ctx.stroke();
         }
 
@@ -175,8 +179,8 @@ export class SunMoonImage {
         for (let i = 0; i < 360; i += 90) {
             ctx.rotate(90 * Math.PI/180);
             ctx.beginPath();
-            ctx.moveTo(sunRadius - 25, 0);
-            ctx.lineTo(sunRadius + 25, 0);
+            ctx.moveTo(sunCircleRadius - 30, 0);
+            ctx.lineTo(sunCircleRadius + 30, 0);
             ctx.stroke();
         }
 
@@ -184,25 +188,25 @@ export class SunMoonImage {
 
         // Draw the path circle for the sun
         ctx.strokeStyle = sunCircleColor;
-        ctx.lineWidth = 18;
+        ctx.lineWidth = sunArcWidth -4; // Slightly smaller.  We will draw over this and we don't want any edges showing
         ctx.beginPath();
-        ctx.arc(centerX, centerY, sunRadius, 0, 2 * Math.PI); // Pure 0.3.5 warns on this
+        ctx.arc(centerX, centerY, sunCircleRadius, 0, 2 * Math.PI); // Pure 0.3.5 warns on this
         ctx.stroke();
 
-        // Draw the circle for the moon
-        ctx.strokeStyle = circleColor;
-        ctx.lineWidth = 8;
+        // Draw the path circle for the moon
+        ctx.strokeStyle = moonArcColor;
+        ctx.lineWidth = moonArcWidth/2; // Slightly smaller.  We will draw over this and we don't want any edges showing
         ctx.beginPath();
-        ctx.arc(centerX, centerY, moonRadius, 0, 2 * Math.PI); // Pure 0.3.5 warns on this
+        ctx.arc(centerX, centerY, moonCircleRadius, 0, 2 * Math.PI); // Pure 0.3.5 warns on this
         ctx.stroke();
 
-        // Draw the time labels
+        // Draw the major time labels
         ctx.font = smallFont;
-        ctx.fillStyle = circleColor; //titleColor;
-        ctx.fillText("12 PM", centerX - (ctx.measureText("12 PM").width/2),                  centerY - (sunRadius                       + 50));
-        ctx.fillText("12 AM", centerX - (ctx.measureText("12 AM").width/2),                  centerY + (sunRadius + smallFontCharHeight + 50));
-        ctx.fillText("6 AM",  centerX - (sunRadius  + (ctx.measureText("6 AM").width) + 60), centerY + (smallFontCharHeight/2));
-        ctx.fillText("6 PM",  centerX + (sunRadius  +                                 + 60), centerY + (smallFontCharHeight/2));
+        ctx.fillStyle = timeLabelColor; //titleColor;
+        ctx.fillText("12 PM", centerX - (ctx.measureText("12 PM").width/2),                  centerY - (sunCircleRadius                       + 50));
+        ctx.fillText("12 AM", centerX - (ctx.measureText("12 AM").width/2),                  centerY + (sunCircleRadius + smallFontCharHeight + 50));
+        ctx.fillText("6 AM",  centerX - (sunCircleRadius  + (ctx.measureText("6 AM").width) + 60), centerY + (smallFontCharHeight/2));
+        ctx.fillText("6 PM",  centerX + (sunCircleRadius  +                                 + 60), centerY + (smallFontCharHeight/2));
 
         // SunMoonJson
         //     "sunrise": "06:20",
@@ -230,15 +234,16 @@ export class SunMoonImage {
         ctx.lineWidth = sunArcWidth;
         ctx.strokeStyle = sunArcColor;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, sunRadius, this.getRenderAngle(sunriseAngle), this.getRenderAngle(sunsetAngle)); // Pure 0.3.5 warns on this
+        ctx.arc(centerX, centerY, sunCircleRadius, this.getRenderAngle(sunriseAngle), this.getRenderAngle(sunsetAngle)); // Pure 0.3.5 warns on this
         ctx.stroke();
         
         // Draw the AM twilight range using a gradient
-        const sunriseX    = sunRadius * Math.sin(this.getRenderAngle(sunriseAngle + 90)); 
-        const sunriseY    = sunRadius * Math.cos(this.getRenderAngle(sunriseAngle + 90));
-        const amTwilightX = sunRadius * Math.sin(this.getRenderAngle(amTwilightAngle + 90));
-        const amTwilightY = sunRadius * Math.cos(this.getRenderAngle(amTwilightAngle + 90));
+        const sunriseX    = sunCircleRadius * Math.sin(this.getRenderAngle(sunriseAngle + 90)); 
+        const sunriseY    = sunCircleRadius * Math.cos(this.getRenderAngle(sunriseAngle + 90));
+        const amTwilightX = sunCircleRadius * Math.sin(this.getRenderAngle(amTwilightAngle + 90));
+        const amTwilightY = sunCircleRadius * Math.cos(this.getRenderAngle(amTwilightAngle + 90));
 
+        // Setup the AM gradient
         const amGrad = ctx.createLinearGradient(centerX + sunriseX, centerY - sunriseY, centerX + amTwilightX, centerY - amTwilightY);
         amGrad.addColorStop(0.0, sunTwilightArcColor1);
         amGrad.addColorStop(1.0, sunTwilightArcColor3);
@@ -249,9 +254,9 @@ export class SunMoonImage {
         // ctx.lineTo(centerX + amTwilightX, centerY - amTwilightY);
         // ctx.stroke();
 
-        // Draw the short arc
+        // Draw the AM twilight arc
         ctx.beginPath();
-        ctx.arc(centerX, centerY, sunRadius, this.getRenderAngle(amTwilightAngle), this.getRenderAngle(sunriseAngle)); // Pure 0.3.5 warns on this
+        ctx.arc(centerX, centerY, sunCircleRadius, this.getRenderAngle(amTwilightAngle), this.getRenderAngle(sunriseAngle)); // Pure 0.3.5 warns on this
         ctx.stroke();
 
         // Draw a line at sunrise
@@ -261,8 +266,8 @@ export class SunMoonImage {
         ctx.lineWidth = 3;
         ctx.rotate(this.getRenderAngle(sunriseAngle));
         ctx.beginPath();
-        ctx.moveTo(sunRadius - 50, 0);
-        ctx.lineTo(sunRadius + 50, 0);
+        ctx.moveTo(sunCircleRadius - 50, 0);
+        ctx.lineTo(sunCircleRadius + 50, 0);
         ctx.stroke();
         ctx.rotate(-this.getRenderAngle(sunriseAngle));
         ctx.restore();
@@ -274,100 +279,143 @@ export class SunMoonImage {
         ctx.lineWidth = 3;
         ctx.rotate(this.getRenderAngle(amTwilightAngle));
         ctx.beginPath();
-        ctx.moveTo(sunRadius - 50, 0);
-        ctx.lineTo(sunRadius + 50, 0);
+        ctx.moveTo(sunCircleRadius - 50, 0);
+        ctx.lineTo(sunCircleRadius + 50, 0);
         ctx.stroke();
         ctx.rotate(-this.getRenderAngle(amTwilightAngle));
         ctx.restore();
 
-
         // Draw the evening twilight arc
-        // Setup the pm gradient
-        const sunsetX     = sunRadius * Math.sin(this.getRenderAngle(sunsetAngle + 90)); 
-        const sunsetY     = sunRadius * Math.cos(this.getRenderAngle(sunsetAngle + 90));
-        const pmTwilightX = sunRadius * Math.sin(this.getRenderAngle(pmTwilightAngle + 90));
-        const pmTwilightY = sunRadius * Math.cos(this.getRenderAngle(pmTwilightAngle + 90));
+        const sunsetX     = sunCircleRadius * Math.sin(this.getRenderAngle(sunsetAngle + 90)); 
+        const sunsetY     = sunCircleRadius * Math.cos(this.getRenderAngle(sunsetAngle + 90));
+        const pmTwilightX = sunCircleRadius * Math.sin(this.getRenderAngle(pmTwilightAngle + 90));
+        const pmTwilightY = sunCircleRadius * Math.cos(this.getRenderAngle(pmTwilightAngle + 90));
 
+        // Setup the pm gradient
         const pmGrad = ctx.createLinearGradient(centerX + sunsetX, centerY - sunsetY, centerX + pmTwilightX, centerY - pmTwilightY);
         pmGrad.addColorStop(0.0, sunTwilightArcColor1);
         pmGrad.addColorStop(1.0, sunTwilightArcColor3);
         ctx.strokeStyle = pmGrad;
 
-        // Draw PM twilight
+        // Draw PM twilight arc
         ctx.beginPath();
-        ctx.lineWidth = 20;
-        ctx.arc(centerX, centerY, sunRadius, this.getRenderAngle(sunsetAngle), this.getRenderAngle(pmTwilightAngle)); // Pure 0.3.5 warns on this
+        ctx.lineWidth = sunArcWidth;
+        ctx.arc(centerX, centerY, sunCircleRadius, this.getRenderAngle(sunsetAngle), this.getRenderAngle(pmTwilightAngle)); // Pure 0.3.5 warns on this
         ctx.stroke();
 
-        // Draw a longer tick mark at sunset
+        // Draw a long tick mark at sunset
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.strokeStyle = labelColor;
         ctx.lineWidth = 3;
         ctx.rotate(this.getRenderAngle(sunsetAngle));
         ctx.beginPath();
-        ctx.moveTo(sunRadius - 50, 0);
-        ctx.lineTo(sunRadius + 50, 0);
+        ctx.moveTo(sunCircleRadius - 50, 0);
+        ctx.lineTo(sunCircleRadius + 50, 0);
         ctx.stroke();
         ctx.rotate(-this.getRenderAngle(sunsetAngle));
         ctx.translate(-centerX, -centerY);
         ctx.restore();
 
-        // Draw a longer tick mark at PM twilight
+        // Draw a long tick mark at PM twilight
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.strokeStyle = labelColor;
         ctx.lineWidth = 3;
         ctx.rotate(this.getRenderAngle(pmTwilightAngle));
         ctx.beginPath();
-        ctx.moveTo(sunRadius - 50, 0);
-        ctx.lineTo(sunRadius + 50, 0);
+        ctx.moveTo(sunCircleRadius - 50, 0);
+        ctx.lineTo(sunCircleRadius + 50, 0);
         ctx.stroke();
         ctx.rotate(-this.getRenderAngle(pmTwilightAngle));
         ctx.translate(-centerX, -centerY);
         ctx.restore();
 
         // Draw the moon up arc
-        ctx.lineWidth = 20;
-        ctx.strokeStyle = moonArcColor;
+        // ctx.lineCap = "round"; // line caps not support in pureImage
+        ctx.lineWidth = moonArcWidth;
+        ctx.strokeStyle = moonUpColor;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, moonRadius, this.getRenderAngle(moonriseAngle), this.getRenderAngle(moonsetAngle)); // Pure 0.3.5 warns on this
+        ctx.arc(centerX, centerY, moonCircleRadius, this.getRenderAngle(moonriseAngle), this.getRenderAngle(moonsetAngle)); // Pure 0.3.5 warns on this
         ctx.stroke();
-        
 
-        // Draw the sun
+        // Draw a little circle to simulate the "lineCap = 'round'" behavior
+        // Draw rounded end of the moon arc at the rise point
+        ctx.save();
+        ctx.translate(centerX, centerY);            // Set the origin to the center
+        ctx.rotate(this.getRenderAngle(moonriseAngle));               // Rotate our reference so the current time is on the X axis
+
+        ctx.beginPath();
+        ctx.fillStyle = moonUpColor;
+        ctx.arc(moonCircleRadius, 0, moonArcWidth/2, 0, 2 * Math.PI);  // Now draw the sun itself
+        ctx.fill();
+
+        ctx.rotate(-this.getRenderAngle(currentTimeAngle));
+        ctx.restore();
+
+        // Draw rounded end of the moon arc at the set point
+        ctx.save();
+        ctx.translate(centerX, centerY);            // Set the origin to the center
+        ctx.rotate(this.getRenderAngle(moonsetAngle));               // Rotate our reference so the current time is on the X axis
+
+        // Draw a circle in the arc color
+        ctx.beginPath();
+        ctx.fillStyle = moonUpColor;
+        ctx.arc(moonCircleRadius, 0, moonArcWidth/2, 0, 2 * Math.PI);  // Now draw the sun itself
+        ctx.fill();
+
+        ctx.rotate(-this.getRenderAngle(currentTimeAngle));
+        ctx.restore();
+
+
+
+
+
+
+        // Draw the sun on the arc
+        // Translate
         ctx.save();
         ctx.translate(centerX, centerY);            // Set the origin to the center
         ctx.rotate(this.getRenderAngle(currentTimeAngle));               // Rotate our reference so the current time is on the X axis
 
+        // Clear a background circle 
         ctx.beginPath();
         ctx.fillStyle = backgroundColor;
-        ctx.arc(sunRadius, 0, 35, 0, 2 * Math.PI);  // Draw a circle with the background color to clear the arc we drew above
+        ctx.arc(sunCircleRadius, 0, sunRadius + 5, 0, 2 * Math.PI);  // Draw a circle with the background color to clear the arc we drew above
         ctx.fill();
 
+        // Draw a circle in the arc color
+        ctx.beginPath();
+        ctx.fillStyle = sunArcColor;
+        ctx.arc(sunCircleRadius, 0, sunRadius, 0, 2 * Math.PI);  // Now draw the sun itself
+        ctx.fill();
+
+        // Draw a circle in the brighter (daytime) color
         ctx.beginPath();
         ctx.fillStyle = (currentTimeAngle > sunriseAngle && currentTimeAngle < sunsetAngle) ? sunUpColor : sunDownColor;
-        ctx.arc(sunRadius, 0, 30, 0, 2 * Math.PI);  // Now draw the sun itself
+        ctx.arc(sunCircleRadius, 0, sunRadius - 3, 0, 2 * Math.PI);  // Now draw the sun itself
         ctx.fill();
 
-        // Draw the moon.  Draw a background cicle to clear the arc, draw an outline circle, draw the fill in a different color if visible
-        ctx.beginPath();
-        ctx.fillStyle = backgroundColor;
-        ctx.arc(moonRadius, 0, 35, 0, 2 * Math.PI);  // Draw a circle with the background color to clear the arc we drew above
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.fillStyle = moonDownColor;
-        ctx.arc(moonRadius, 0, 30, 0, 2 * Math.PI);  // Now draw the moon itself, this may just be an outline after the next draw
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.fillStyle = (currentTimeAngle > moonriseAngle && currentTimeAngle < moonsetAngle) ? moonUpColor : moonDownColor;
-        ctx.arc(moonRadius, 0, 28, 0, 2 * Math.PI);  // Now draw the moon itself
-        ctx.fill();
-        
         ctx.rotate(-this.getRenderAngle(currentTimeAngle));
         ctx.restore();
+
+        // Draw the moon.  Draw a background cicle to clear the arc, draw an outline circle, draw the fill in a different color if visible
+        // ctx.beginPath();
+        // ctx.fillStyle = backgroundColor;
+        // ctx.arc(moonCircleRadius, 0, moonRadius + 5, 0, 2 * Math.PI);  // Draw a circle with the background color to clear the arc we drew above
+        // ctx.fill();
+        
+        // ctx.beginPath();
+        // ctx.fillStyle = moonDownColor;
+        // ctx.arc(moonCircleRadius, 0, moonRadius, 0, 2 * Math.PI);  // Now draw the moon itself, this may just be an outline after the next draw
+        // ctx.fill();
+        
+        // ctx.beginPath();
+        // ctx.fillStyle = (currentTimeAngle > moonriseAngle && currentTimeAngle < moonsetAngle) ? moonUpColor : moonDownColor;
+        // ctx.arc(moonCircleRadius, 0, moonRadius - 2, 0, 2 * Math.PI);  // Now draw the moon itself
+        // ctx.fill();
+        
+        
 
         // Draw the labels for sunrise, sunset, first light, last light
         ctx.font = smallFont;

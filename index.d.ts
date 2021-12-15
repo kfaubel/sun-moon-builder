@@ -20,5 +20,5 @@ export interface ImageWriterInterface {
 
 export declare class SunMoonBuilder {
     constructor(logger: LoggerInterface, cache: KacheInterface, writer: ImageWriterInterface);
-    CreateImages(name: string, fileName: string, lat: string, lon: string, apiKey: string, dateStr: string): Promise<boolean>
+    CreateImages(name: string, fileName: string, lat: string, lon: string, apiKey: string, timeZone: string, dateStr: string): Promise<boolean>
 }

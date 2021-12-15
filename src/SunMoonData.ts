@@ -42,6 +42,7 @@ export interface SunMoonJson {
     lunarIllumination: string;
     lunarWaxWane: string;
     lunarPhase: string;
+    lunarPhase2: string;
 }
 
 const MOON_PERIOD_DAYS = 29.53058770576;   // Earth days for one moon cycle
@@ -92,10 +93,10 @@ export class SunMoonData {
             rawJson = response.data;
 
             if (rawJson !== null) {
-                rawJson.lunarAgeDays = this.getMoonAgeDays(date);
+                rawJson.lunarAgeDays      = this.getMoonAgeDays(date);
                 rawJson.lunarIllumination = this.getMoonIllumination(rawJson.lunarAgeDays);
-                rawJson.lunarWaxWane = this.getWaxWane(rawJson.lunarAgeDays);
-                rawJson.lunarPhase = this.getPhaseStr(rawJson.lunarAgeDays);
+                rawJson.lunarWaxWane      = this.getWaxWane(rawJson.lunarAgeDays);
+                rawJson.lunarPhase        = this.getPhaseStr(rawJson.lunarAgeDays);
                 this.logger.info(`Date: ${date.toString()}, age: ${rawJson.lunarAgeDays}, Percent: ${rawJson.lunarIllumination}`);
 
                 const midnightTonight = moment().tz(timeZone).endOf("day");
@@ -110,7 +111,7 @@ export class SunMoonData {
         return rawJson;
     }
 
-    // Return the moon cycle age (0.0 - 1.0) 
+    // Return the moon cycle age in days (0.0 - 29.0) 
     // Ref: https://stackoverflow.com/questions/11759992/calculating-jdayjulian-day-in-javascript
     private getMoonAgeDays(date:  Date): number {
         const julianDate = date.getTime() / MSEC_PER_DAY - date.getTimezoneOffset() / MIN_PER_DAY + UNIX_EPOCH;
@@ -148,7 +149,7 @@ export class SunMoonData {
     }
 
     private getWaxWane(ageDays: number): string {
-        if (ageDays < MOON_PERIOD_DAYS)
+        if (ageDays < MOON_PERIOD_DAYS/2)
             return "waxing";
         else
             return "waning";
@@ -161,7 +162,7 @@ export class SunMoonData {
         else if (ageDays < phaseLength * 5)  return "First Quarter";
         else if (ageDays < phaseLength * 7)  return "Waxing Gibbous";
         else if (ageDays < phaseLength * 9)  return "Full Moon";
-        else if (ageDays < phaseLength * 11) return "Waning Quarter";
+        else if (ageDays < phaseLength * 11) return "Waning Gibbus";
         else if (ageDays < phaseLength * 13) return "Last Quarter";
         else if (ageDays < phaseLength * 15) return "Waning Crescent";
         else                                 return "New Moon";

@@ -23,14 +23,19 @@ export class SunMoonBuilder {
             const result = await weatherImage.getImage(location, lat, lon, apiKey, timeZone, dateStr);
 
             if (result !== null && result.imageData !== null ) {
-                this.logger.info(`CreateImages: Writing: ${fileName}`);
+                this.logger.info(`SunMoonBuilder CreateImages: Writing: ${fileName}`);
                 this.writer.saveFile(fileName, result.imageData.data);
             } else {
-                this.logger.error("CreateImages: No imageData returned from weatherImage.getImage");
+                this.logger.error("SunMoonBuilder CreateImages: No image returned from weatherImage.getImage");
                 return false;
             }
-        } catch (e: any) {
-            this.logger.error(`CreateImages: Exception: ${e.stack}`);
+        } catch(e) {
+            if (e instanceof Error) {
+                this.logger.error(`SunMoonBuilder CreateImages: Exception: ${e.message}`);
+                this.logger.error(`${e.stack}`);
+            } else {
+                this.logger.error(`SunMoonBuilder CreateImages: Exception: ${e}`);
+            }
             return false;
         }
 

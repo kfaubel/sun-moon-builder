@@ -60,7 +60,15 @@ export class SunMoonData {
         this.cache = cache;
     }    
 
-    // Date is optional and used mostly for testing.  Format is: YYYY-MM-DD
+    /**
+     * Get the sun and moon data from cache or a REST GET to api.ipgeolocation.io
+     * @param lat lattitude (e.g.: 41.65)
+     * @param lon longitude (e.g.: -71.45)
+     * @param apiKey Key for https://api.ipgeolocation.io
+     * @param timeZone Show for this timeZone
+     * @param dateStr Optional.  Used instead of today to find the data, mostly used for testing.  Format is: YYYY-MM-DD
+     * @returns SunMoonJson - sun rise/set, moon rise/set, moon illuminaiton, phase, etc.
+     */
     public async getSunMoonData(lat: string, lon: string, apiKey: string, timeZone: string, dateStr = ""): Promise<SunMoonJson | null> { 
         let rawJson: SunMoonJson | null = null;
         let dateParam: string;
@@ -78,18 +86,15 @@ export class SunMoonData {
 
         const key = `lat:${lat}-lon:${lon}-date:${dateParam}`;
 
-        this.logger.info(`Checking cache for ${key}`);
-
         const sunMoonJson: SunMoonJson | null = this.cache.get(key) as SunMoonJson;
         if (sunMoonJson !== null) {
             return sunMoonJson;
         }
 
         const url = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&lat=${lat}&long=${lon}&date=${dateParam}`;
-        this.logger.info(`URL: ${url}`);
 
         try {
-            const response = await axios.get(url, {headers: {"Content-Encoding": "gzip"}});
+            const response = await axios.get(url, {headers: {"Content-Encoding": "gzip"}, timeout: 5000});
             rawJson = response.data;
 
             if (rawJson !== null) {
@@ -97,7 +102,6 @@ export class SunMoonData {
                 rawJson.lunarIllumination = this.getMoonIllumination(rawJson.lunarAgeDays);
                 rawJson.lunarWaxWane      = this.getWaxWane(rawJson.lunarAgeDays);
                 rawJson.lunarPhase        = this.getPhaseStr(rawJson.lunarAgeDays);
-                this.logger.info(`Date: ${date.toString()}, age: ${rawJson.lunarAgeDays}, Percent: ${rawJson.lunarIllumination}`);
 
                 const midnightTonight = moment().tz(timeZone).endOf("day");
 
@@ -105,14 +109,19 @@ export class SunMoonData {
             }
         } catch(e) {
             this.logger.error(`SunMoonData: Error getting data: ${e}`);
+            this.logger.error(`SunMoon URL: ${url}`);
             rawJson = null;
         }
 
         return rawJson;
     }
 
-    // Return the moon cycle age in days (0.0 - 29.0) 
-    // Ref: https://stackoverflow.com/questions/11759992/calculating-jdayjulian-day-in-javascript
+    /**
+     * Gets the age of the moon cycle.  New moon is 0.  Full moon is ~14.
+     * - Ref: https://stackoverflow.com/questions/11759992/calculating-jdayjulian-day-in-javascript
+     * @param date A Javascript Date object
+     * @returns the moon cycle age in days (0.0 - 29.0) 
+     */
     private getMoonAgeDays(date:  Date): number {
         const julianDate = date.getTime() / MSEC_PER_DAY - date.getTimezoneOffset() / MIN_PER_DAY + UNIX_EPOCH;
         let ageDays = (julianDate - LUNAR_REFERENCE) % MOON_PERIOD_DAYS;
@@ -121,8 +130,13 @@ export class SunMoonData {
         return ageDays;
     }
 
-    // For days 0 - 14.5, the percentage increases
-    // For days 14.5 - 29, the percentage decreases
+    /**
+     * Get the percentage into the moon cycle
+     *   - For days 0 - 14.5, the percentage increases
+     *   - For days 14.5 - 29, the percentage decreases
+     * @param ageDays age in the cycle 0-29
+     * @returns The percentage (e.g.: 17%)
+     */
     private getMoonAgePercent(ageDays: number): string {
         const cycleMidpoint = (MOON_PERIOD_DAYS/2);
         let agePercent: number;
@@ -138,16 +152,26 @@ export class SunMoonData {
         return (`${agePercent.toFixed(0)}%`);
     }
     
-    // Illumination is proportional to the cos function.
-    // * The ageDays/MOON_PERIOS_DAYS ranges from 0-1 over one full cycle.  Multiple by 360 degrees
-    // * Cosine ranges from 1 -> 0 -> -1 -> 0 -> 1
-    // * we need to scale by 50 and add 50 to give us a range of 0 - 100 - 0
+    /**
+     * Get the illumination percent of the moon
+     *   - Illumination is proportional to the cos function.
+     *   - The ageDays/MOON_PERIOS_DAYS ranges from 0-1 over one full cycle.  Multiple by 360 degrees
+     *   - Cosine ranges from 1 -> 0 -> -1 -> 0 -> 1
+     *   - we need to scale by 50 and add 50 to give us a range of 0 - 100 - 0
+     * @param ageDays age in the cycle 0-29
+     * @returns 
+     */
     private getMoonIllumination(ageDays: number): string {
         const illumination = (50 + (50 * Math.cos((ageDays/MOON_PERIOD_DAYS * 360 + 180) * Math.PI/180)));
         
         return (`${illumination.toFixed(0)}%`);
     }
 
+    /**
+     * Simple function to return if the moon is waxing or waning
+     * @param ageDays age in the cycle 0-29
+     * @returns "waxing" or "waning"
+     */
     private getWaxWane(ageDays: number): string {
         if (ageDays < MOON_PERIOD_DAYS/2)
             return "waxing";
@@ -155,6 +179,11 @@ export class SunMoonData {
             return "waning";
     }
 
+    /**
+     * Simple function to return the name of the phase of the moon (e.g.: New Moon, Waxing Cresent, ...)
+     * @param ageDays age in the cycle 0-29
+     * @returns Two word name of the phase of the moon
+     */
     private getPhaseStr(ageDays: number): string {
         const phaseLength = MOON_PERIOD_DAYS/16; // 8 phases but new is 0-1.8 and 27.7-29.5 days, so split into 16 parts
         if (ageDays < phaseLength)           return "New Moon";
@@ -166,6 +195,5 @@ export class SunMoonData {
         else if (ageDays < phaseLength * 13) return "Last Quarter";
         else if (ageDays < phaseLength * 15) return "Waning Crescent";
         else                                 return "New Moon";
-    }
-    
+    }  
 }

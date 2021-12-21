@@ -77,7 +77,7 @@ export class SunMoonImage {
         const sunMoonJson: SunMoonJson | null = await  sunMoonData.getSunMoonData(lat, lon, apiKey, timeZone, dateStr);
 
         if (sunMoonJson === null) {
-            this.logger.warn("SunMoonImage: Failed to get data, no image available.\n");
+            this.logger.warn("SunMoonImage  getImage: Failed to get data, no image available.\n");
             return null;
         }
 
@@ -514,8 +514,6 @@ export class SunMoonImage {
             pmTwilightXY = labelSlots[8];
         }
 
-        this.logger.info(`width of Sunrise: ${ctx.measureText("sunrise").width}`);
-
         ctx.centerText("Sunrise",                                    sunriseXY.x, sunriseXY.y); 
         ctx.centerText(`${this.formatTime(sunMoonJson.sunrise)}`,    sunriseXY.x, sunriseXY.y + 50);
         ctx.centerText("Sunset " ,                                   sunsetXY.x,  sunsetXY.y);
@@ -661,7 +659,7 @@ export class SunMoonImage {
             Number(timeElements[0]) > 23 ||
             Number(timeElements[1]) < 0 ||
             Number(timeElements[1]) > 59) {
-            this.logger.warn(`SunMoonImage: formatTIm() failed on input "${timeStr}`);
+            this.logger.warn(`SunMoonImage: formatTime() failed on input "${timeStr}`);
             return "";
         }
         let hour = +timeElements[0] % 12;

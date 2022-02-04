@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import moment from "moment-timezone";  // https://momentjs.com/timezone/docs/ &  https://momentjs.com/docs/
 import { LoggerInterface } from "./Logger";
 import { KacheInterface } from "./Kache";
@@ -38,11 +38,11 @@ export interface SunMoonJson {
     moonset: string;
     firstLight?: string;
     lastLight?: string;
-    lunarAgeDays: number;
-    lunarIllumination: string;
-    lunarWaxWane: string;
-    lunarPhase: string;
-    lunarPhase2: string;
+    lunarAgeDays?: number;
+    lunarIllumination?: string;
+    lunarWaxWane?: string;
+    lunarPhase?: string;
+    //lunarPhase2: string;
 }
 
 const MOON_PERIOD_DAYS = 29.53058770576;   // Earth days for one moon cycle
@@ -70,50 +70,61 @@ export class SunMoonData {
      * @returns SunMoonJson - sun rise/set, moon rise/set, moon illuminaiton, phase, etc.
      */
     public async getSunMoonData(lat: string, lon: string, apiKey: string, timeZone: string, dateStr = ""): Promise<SunMoonJson | null> { 
-        let rawJson: SunMoonJson | null = null;
+        let sunMoonJson: SunMoonJson | null = null;
         let dateParam: string;
         let date: Date;
-        const now: moment.Moment = moment();
-
-
-        if (dateStr === "") {
-            date = new Date();
-            dateParam = now.tz(timeZone).format("YYYY-MM-DD");
-        } else {
-            dateParam = dateStr;
-            date = new Date(dateStr);
-        }
-
-        const key = `lat:${lat}-lon:${lon}-date:${dateParam}`;
-
-        const sunMoonJson: SunMoonJson | null = this.cache.get(key) as SunMoonJson;
-        if (sunMoonJson !== null) {
-            return sunMoonJson;
-        }
-
-        const url = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&lat=${lat}&long=${lon}&date=${dateParam}`;
-
         try {
-            const response = await axios.get(url, {headers: {"Content-Encoding": "gzip"}, timeout: 5000});
-            rawJson = response.data;
+            const now: moment.Moment = moment();
 
-            if (rawJson !== null) {
-                rawJson.lunarAgeDays      = this.getMoonAgeDays(date);
-                rawJson.lunarIllumination = this.getMoonIllumination(rawJson.lunarAgeDays);
-                rawJson.lunarWaxWane      = this.getWaxWane(rawJson.lunarAgeDays);
-                rawJson.lunarPhase        = this.getPhaseStr(rawJson.lunarAgeDays);
-
-                const midnightTonight = moment().tz(timeZone).endOf("day");
-
-                this.cache.set(key, rawJson, midnightTonight.valueOf());
+            if (dateStr === "") {
+                date = new Date();
+                dateParam = now.tz(timeZone).format("YYYY-MM-DD");
+            } else {
+                dateParam = dateStr;
+                date = new Date(dateStr);
             }
+
+            const key = `lat:${lat}-lon:${lon}-date:${dateParam}`;
+
+            sunMoonJson = this.cache.get(key) as SunMoonJson;
+            if (sunMoonJson !== null) {
+                return sunMoonJson;
+            }
+
+            const url = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&lat=${lat}&long=${lon}&date=${dateParam}`;
+
+            const options: AxiosRequestConfig = {
+                responseType: "json",
+                headers: {                        
+                    "Content-Encoding": "gzip"
+                },
+                timeout: 5000
+            };
+
+            await axios.get(url, options)
+                .then((res: AxiosResponse) => {
+                    sunMoonJson = res.data as SunMoonJson;
+                    sunMoonJson.lunarAgeDays      = this.getMoonAgeDays(date);
+                    sunMoonJson.lunarIllumination = this.getMoonIllumination(sunMoonJson.lunarAgeDays);
+                    sunMoonJson.lunarWaxWane      = this.getWaxWane(sunMoonJson.lunarAgeDays);
+                    sunMoonJson.lunarPhase        = this.getPhaseStr(sunMoonJson.lunarAgeDays);
+                })
+                .catch((error) => {
+                    this.logger.warn(`SunMoonData: No data: ${error})`);
+                });
+            
+            if (sunMoonJson === null) {
+                return null;
+            }
+
+            const midnightTonight = moment().tz(timeZone).endOf("day");
+            this.cache.set(key, sunMoonJson, midnightTonight.valueOf());            
         } catch(e) {
-            this.logger.error(`SunMoonData: Error getting data: ${e}`);
-            this.logger.error(`SunMoon URL: ${url}`);
-            rawJson = null;
+            this.logger.warn(`SunMoonData: Error getting data: ${e}`);
+            sunMoonJson = null;
         }
 
-        return rawJson;
+        return sunMoonJson;
     }
 
     /**

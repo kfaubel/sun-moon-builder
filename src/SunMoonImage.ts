@@ -77,7 +77,6 @@ export class SunMoonImage {
         const sunMoonJson: SunMoonJson | null = await  sunMoonData.getSunMoonData(lat, lon, apiKey, timeZone, dateStr);
 
         if (sunMoonJson === null) {
-            this.logger.warn("SunMoonImage  getImage: Failed to get data, no image available.\n");
             return null;
         }
 
@@ -420,7 +419,13 @@ export class SunMoonImage {
         ctx.rotate(-this.getRenderAngle(currentTimeAngle));
         ctx.restore();
 
-        // Draw the moon.  Draw a background cicle to clear the arc, draw an outline circle, draw the fill in a different color if visible
+        // // Draw the moon.  Draw a background cicle to clear the arc, draw an outline circle, draw the fill in a different color if visible
+        // // Draw the sun on the arc
+        // // Translate
+        // ctx.save();
+        // ctx.translate(centerX, centerY);            // Set the origin to the center
+        // ctx.rotate(this.getRenderAngle(currentTimeAngle));               // Rotate our reference so the current time is on the X axis
+
         // ctx.beginPath();
         // ctx.fillStyle = backgroundColor;
         // ctx.arc(moonCircleRadius, 0, moonRadius + 5, 0, 2 * Math.PI);  // Draw a circle with the background color to clear the arc we drew above
@@ -435,6 +440,9 @@ export class SunMoonImage {
         // ctx.fillStyle = (currentTimeAngle > moonriseAngle && currentTimeAngle < moonsetAngle) ? moonUpColor : moonDownColor;
         // ctx.arc(moonCircleRadius, 0, moonRadius - 2, 0, 2 * Math.PI);  // Now draw the moon itself
         // ctx.fill();
+
+        // ctx.rotate(-this.getRenderAngle(currentTimeAngle));
+        // ctx.restore();
         
         
 

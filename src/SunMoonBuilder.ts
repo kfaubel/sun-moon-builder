@@ -26,7 +26,7 @@ export class SunMoonBuilder {
                 this.logger.info(`SunMoonBuilder CreateImages: Writing: ${fileName}`);
                 this.writer.saveFile(fileName, result.imageData.data);
             } else {
-                this.logger.error("SunMoonBuilder CreateImages: No image returned from weatherImage.getImage");
+                this.logger.warn("SunMoonBuilder CreateImages: No image available");
                 return false;
             }
         } catch(e) {

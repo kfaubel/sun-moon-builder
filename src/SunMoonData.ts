@@ -101,8 +101,12 @@ export class SunMoonData {
                 timeout: 5000
             };
 
+            const startTime = new Date();
             await axios.get(url, options)
                 .then((res: AxiosResponse) => {
+                    if (typeof process.env.TRACK_GET_TIMES !== "undefined" ) {
+                        this.logger.info(`WebImageImage: GET TIME: ${new Date().getTime() - startTime.getTime()}ms`);
+                    }
                     sunMoonJson = res.data as SunMoonJson;
                     sunMoonJson.lunarAgeDays      = this.getMoonAgeDays(date);
                     sunMoonJson.lunarIllumination = this.getMoonIllumination(sunMoonJson.lunarAgeDays);

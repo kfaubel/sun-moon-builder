@@ -31,8 +31,7 @@ export class SunMoonBuilder {
             }
         } catch(e) {
             if (e instanceof Error) {
-                this.logger.error(`SunMoonBuilder CreateImages: Exception: ${e.message}`);
-                this.logger.error(`${e.stack}`);
+                this.logger.error(`SunMoonBuilder CreateImages: ${e.stack}`);
             } else {
                 this.logger.error(`SunMoonBuilder CreateImages: Exception: ${e}`);
             }

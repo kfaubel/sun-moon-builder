@@ -98,7 +98,7 @@ export class SunMoonData {
                 headers: {                        
                     "Content-Encoding": "gzip"
                 },
-                timeout: 5000
+                timeout: 20000
             };
 
             const startTime = new Date();
@@ -123,8 +123,12 @@ export class SunMoonData {
 
             const midnightTonight = moment().tz(timeZone).endOf("day");
             this.cache.set(key, sunMoonJson, midnightTonight.valueOf());            
-        } catch(e) {
-            this.logger.warn(`SunMoonData: Error getting data: ${e}`);
+        } catch (e) {
+            if (e instanceof Error) {
+                this.logger.error(`SunMoonData: ${e.stack}`);
+            } else {
+                this.logger.error(`${e}`);
+            }
             sunMoonJson = null;
         }
 

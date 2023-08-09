@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import jpeg from "jpeg-js";
 import path from "path";
-import dateFormat from "dateformat";
 import * as pure from "pureimage";
 
 import { SunMoonData, SunMoonJson } from "./SunMoonData";
@@ -12,6 +11,12 @@ import { relativeTimeThreshold } from "moment";
 export interface ImageResult {
     imageType: string;
     imageData: jpeg.BufferRet | null;
+}
+
+export interface ImageBuffer {
+    width: number;
+    height: number;
+    data: Uint8Array;
 }
 
 export class SunMoonImage {
@@ -39,7 +44,8 @@ export class SunMoonImage {
      * @param h Hieght of the rect
      * @param rgb Color in the form "#rrggbb"
      */
-    private myFillRect(img: any, x: number, y: number, w: number, h: number, rgb: string) {
+    // xeslint-disable-next-line @typescript-eslint/no-explicit-any
+    private myFillRect(img: ImageBuffer, x: number, y: number, w: number, h: number, rgb: string) {
         const colorValue = parseInt(rgb.substring(1), 16);
 
         // the shift operator forces js to perform the internal ToUint32 (see ecmascript spec 9.6)
@@ -94,7 +100,7 @@ export class SunMoonImage {
 
         const dataDate        = new Date(sunMoonJson.date + "T00:00:00"); // Without the explicit time, Date.Parse assume this is UTC and the day is off by 1.
         const title           = `Sun & Moon Times for ${location}`;
-        const dateDisplayStr  = `${dateFormat(dataDate, "mmmm dS, yyyy")}`;
+        const dateDisplayStr  = `${dataDate.toLocaleString()}`;
 
         // Define layout constants
         const imageHeight              = 1080; 

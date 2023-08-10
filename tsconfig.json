@@ -5,10 +5,10 @@
     "display": "Node 14",
   
     "compilerOptions": {
-      //"lib": ["es2020"],                          // Reccomended for Node 14 - lib version in generated JS code (default matches target)
-      "module": "commonjs",                         // Reccomended for Node 14 - what module resolution system to assume when generating JS code
-      "target":"ES2020",                            // Reccomended for Node 14 - what flavor of JS to generate natively, newer syntax generates emulated code
-
+      "lib": ["es2023"],                            // Reccomended for Node 20 - lib version in generated JS code (default matches target)
+      "module": "commonjs",                         // Reccomended for Node 20 - what module resolution system to assume when generating JS code
+      "target":"ES2022",                            // Reccomended for Node 20 - what flavor of JS to generate natively, newer syntax generates emulated code
+       
       "moduleResolution": "Node",                   // How tsc tries to find modules, tsc matches nodejs so "node" is the best choice.  Default for Node.
 
       "strict": true,                               // Reccomended for Node 14

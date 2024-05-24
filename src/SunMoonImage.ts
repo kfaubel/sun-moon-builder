@@ -110,7 +110,7 @@ export class SunMoonImage {
         const centerY                  = imageHeight/2 + 40;     // leave some extra room at the top for the title
         const sunCircleRadius          = 380; //imageHeight/3;          //360
         const moonCircleRadius         = 300; //imageHeight/4;          //270
-        const sunArcWidth              = 35;
+        const sunArcWidth              = 20;
         const moonArcWidth             = 33;
         const sunRadius                = 35;                     // The actual sun drawn on the circle
         const moonRadius               = 35;
@@ -126,6 +126,7 @@ export class SunMoonImage {
         const sunTwilightArcColor1     = "#F0E000";
         const sunTwilightArcColor2     = "#B80010";
         const sunTwilightArcColor3     = "#7a2100"; //"#500028";
+        const solidTwilightArcColor    = "#d45b0b";
         const moonArcColor             = "#D0D0D0";
         const moonUpColor              = "#707070";
         const moonDownColor            = "#808080";
@@ -217,6 +218,18 @@ export class SunMoonImage {
 
         ctx.restore();
 
+        // eslint-disable-next-line quotes
+        this.logger.info(`SunMoonImage: Draw test circle at 200, 200, 100, 0, 2 * Math.PI`);
+        ctx.strokeStyle = circleColor;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 380, 0, 2 * Math.PI); 
+        ctx.fillStyle = "red";
+        ctx.stroke;
+        // eslint-disable-next-line quotes
+        this.logger.info(`SunMoonImage: Draw test circle at 200, 200, 100, 0, 2 * Math.PI - Done`);
+
+
         // Draw the path circle for the sun
         ctx.strokeStyle = sunCircleColor;
         ctx.lineWidth = sunArcWidth -4; // Slightly smaller.  We will draw over this and we don't want any edges showing
@@ -274,18 +287,19 @@ export class SunMoonImage {
         const amTwilightX = sunCircleRadius * Math.sin(this.getRenderAngle(amTwilightAngle + 90));
         const amTwilightY = sunCircleRadius * Math.cos(this.getRenderAngle(amTwilightAngle + 90));
 
-        // Setup the AM gradient
-        const amGrad = ctx.createLinearGradient(centerX + sunriseX, centerY - sunriseY, centerX + amTwilightX, centerY - amTwilightY);
-        amGrad.addColorStop(0.0, sunTwilightArcColor1);
-        amGrad.addColorStop(1.0, sunTwilightArcColor3);
-        ctx.strokeStyle = amGrad;
-        ctx.lineWidth = sunArcWidth;
-        // ctx.beginPath();
-        // ctx.moveTo(centerX + sunriseX, centerY - sunriseY);
-        // ctx.lineTo(centerX + amTwilightX, centerY - amTwilightY);
-        // ctx.stroke();
+        // // Setup the AM gradient
+        // const amGrad = ctx.createLinearGradient(centerX + sunriseX, centerY - sunriseY, centerX + amTwilightX, centerY - amTwilightY);
+        // amGrad.addColorStop(0.0, sunTwilightArcColor1);
+        // amGrad.addColorStop(1.0, sunTwilightArcColor3);
+        // ctx.strokeStyle = amGrad;
+        // ctx.lineWidth = sunArcWidth;
+        // // ctx.beginPath();
+        // // ctx.moveTo(centerX + sunriseX, centerY - sunriseY);
+        // // ctx.lineTo(centerX + amTwilightX, centerY - amTwilightY);
+        // // ctx.stroke();
 
         // Draw the AM twilight arc
+        ctx.strokeStyle = solidTwilightArcColor;
         ctx.beginPath();
         ctx.arc(centerX, centerY, sunCircleRadius, this.getRenderAngle(amTwilightAngle), this.getRenderAngle(sunriseAngle)); // Pure 0.3.5 warns on this
         ctx.stroke();
@@ -322,13 +336,14 @@ export class SunMoonImage {
         const pmTwilightX = sunCircleRadius * Math.sin(this.getRenderAngle(pmTwilightAngle + 90));
         const pmTwilightY = sunCircleRadius * Math.cos(this.getRenderAngle(pmTwilightAngle + 90));
 
-        // Setup the pm gradient
-        const pmGrad = ctx.createLinearGradient(centerX + sunsetX, centerY - sunsetY, centerX + pmTwilightX, centerY - pmTwilightY);
-        pmGrad.addColorStop(0.0, sunTwilightArcColor1);
-        pmGrad.addColorStop(1.0, sunTwilightArcColor3);
-        ctx.strokeStyle = pmGrad;
+        // // Setup the pm gradient
+        // const pmGrad = ctx.createLinearGradient(centerX + sunsetX, centerY - sunsetY, centerX + pmTwilightX, centerY - pmTwilightY);
+        // pmGrad.addColorStop(0.0, sunTwilightArcColor1);
+        // pmGrad.addColorStop(1.0, sunTwilightArcColor3);
+        // ctx.strokeStyle = pmGrad;
 
         // Draw PM twilight arc
+        ctx.strokeStyle = solidTwilightArcColor;
         ctx.beginPath();
         ctx.lineWidth = sunArcWidth;
         ctx.arc(centerX, centerY, sunCircleRadius, this.getRenderAngle(sunsetAngle), this.getRenderAngle(pmTwilightAngle)); // Pure 0.3.5 warns on this
